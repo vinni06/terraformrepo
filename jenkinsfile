@@ -1,43 +1,20 @@
 node {
  try  {
   notify('Job Started') 
-  
-  environment {
-    registry = "charan253/capstoneproject"
-    registryCredential = 'charandockerhub'
-  }
-
      
   stage('Git-Checkout') {
-   git 'https://github.com/SaiCharanUppari/dockerrepo.git'
+   git 'https://github.com/SaiCharanUppari/terraformrepo.git'
   }
     
  //def project_path="capstoneproject/capstoneproject/"
  
 // dir(project_path) {
-    
-  stage('Download package from JFrog') {
-            def server= Artifactory.server 'Artifactory'
-            def downloadSpec = """{
-            "files": [
-            {
-                "pattern": "capstoneproject/capstoneproject-0.0.1-SNAPSHOT.war",
-                "target": "./capstoneproject.war"
-            }
-            ]
-            }"""
-        server.download(downloadSpec)
-    }
-       
- stage('Docker-Stage-Deployment') {
-   sh label: '', script: 'docker-compose up -d --build'
-  }
+
+	stage('AWS - Production Server Provisioning'){
+	   sh label: 'terraform', script: '/root/bin/terraform  init'
+	   sh label: 'terraform', script: '/root/bin/terraform  apply -input=false -auto-approve'
+	   }
   
-  /*
-  stage('Pushing DockerImage to DockerHub') {
-   sh label: '', script: 'docker push charan253/capstoneproject:$BUILD_NUMBER'
-  }
-  */
    
 //}	-----------dir end---------  
 
