@@ -1,63 +1,45 @@
 node {
  try  {
   notify('Job Started') 
+  
+  environment {
+    registry = "charan253/capstoneproject"
+    registryCredential = 'charandockerhub'
+  }
 
      
   stage('Git-Checkout') {
-   git 'https://github.com/SaiCharanUppari/projectrepo.git'
+   git 'https://github.com/SaiCharanUppari/dockerrepo.git'
   }
     
- def project_path="capstoneproject/capstoneproject/"
+ //def project_path="capstoneproject/capstoneproject/"
  
- dir(project_path) {
+// dir(project_path) {
     
-  stage('Maven-Clean') {
-   sh label: '', script: 'mvn clean'
-  }
-    
- stage('Maven-Compile') {
-   sh label: '', script: 'mvn compile'
-  }
-  
-   stage('Maven-Test') {
-   sh label: '', script: 'mvn test'
-  }
-  
-  stage('Sonar Analysis') {
-   withSonarQubeEnv('SonarQube') {
-        sh "mvn sonar:sonar"
-    }
-  }
-  /*
-  stage('Sonar - Quality Gate') {
-  	timeout(time: 1, unit: 'MINUTES') {
-                waitForQualityGate abortPipeline: true
+  stage('Download package from JFrog') {
+            def server= Artifactory.server 'Artifactory'
+            def downloadSpec = """{
+            "files": [
+            {
+                "pattern": "capstoneproject/capstoneproject-0.0.1-SNAPSHOT.war",
+                "target": "./capstoneproject.war"
             }
+            ]
+            }"""
+        server.download(downloadSpec)
+    }
+       
+ stage('Docker-Stage-Deployment') {
+   sh label: '', script: 'docker-compose up -d --build'
+  }
+  
+  /*
+  stage('Pushing DockerImage to DockerHub') {
+   sh label: '', script: 'docker push charan253/capstoneproject:$BUILD_NUMBER'
   }
   */
-   stage('Maven-Package') {
-   sh label: '', script: 'mvn package'
-  }
-  
-   stage('Archive-Artifacts') {
-   archiveArtifacts 'target/*.war'
-  }
    
-   stage('Jfrog Artifacory Upload') {
-        def server= Artifactory.server 'Artifactory'
-                    def uploadSpec= """{
-                        "files": [{
-                        "pattern": "target/*.war",
-                        "target": "capstoneproject"}]
-                    }"""
-        server.upload(uploadSpec)
-        
-        }
-	
-	stage('Downstream Build -- Docker Deployment'){
-	 build 'pipe-Docker'
-	}
-}  
+//}	-----------dir end---------  
 
  notify('Job Completed')   
 } catch (err) {
@@ -76,4 +58,3 @@ def notify(status){
 	<p>Check console output at <a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a></p>""",
 		)
 	}
-
