@@ -42,7 +42,6 @@ provisioner "local-exec" {
         echo "[jenkinsci]"| tee -a jenkinsci.ini;
         export ANSIBLE_HOST_KEY_CHECKING=False;
         echo "${aws_instance.backend.public_ip}" | tee -a jenkinsci.ini;
-        ansible-playbook  --key=${var.pvt_key} -i jenkinsci.ini ./ansible/04-Tomcat/web-playbook.yaml -u ubuntu -v
     EOT
 }
 }
