@@ -1,13 +1,13 @@
 node {
  try  {
- // notify('Job Started') 
+  notify('Job Started') 
 
      
   stage('Git-Checkout') {
-   git 'https://github.com/SaiCharanUppari/amit.git'
+   git 'https://github.com/SaiCharanUppari/projectrepo.git'
   }
     
- def project_path="01-Jenkins/Code/capstoneproject"
+ def project_path="capstoneproject/capstoneproject/"
  
  dir(project_path) {
     
@@ -23,6 +23,18 @@ node {
    sh label: '', script: 'mvn test'
   }
   
+  stage('Sonar Analysis') {
+   withSonarQubeEnv('SonarQube') {
+        sh "mvn sonar:sonar"
+    }
+  }
+  /*
+  stage('Sonar - Quality Gate') {
+  	timeout(time: 1, unit: 'MINUTES') {
+                waitForQualityGate abortPipeline: true
+            }
+  }
+  */
    stage('Maven-Package') {
    sh label: '', script: 'mvn package'
   }
@@ -30,32 +42,26 @@ node {
    stage('Archive-Artifacts') {
    archiveArtifacts 'target/*.war'
   }
-   stage('Docker-Stage-Deployment') {
-   sh label: '', script: 'docker-compose up -d --build'
-  }
-  
-  stage('Approval to Production') {
-  input "Proceed to Production?"
-  }
- 
-  stage('Geting Ready For Ansible') {
-  sh label: 'Docker', script: 'cp -rf target/*.war ../../../04-Terraform/03-Ansible-Deploy/ansible/04-Tomcat/templates/'
-  sh label: 'Jenkins', script: "echo '<h1> TASK BUILD ID: ${env.BUILD_DISPLAY_NAME}</h1>' > ../../../04-Terraform/03-Ansible-Deploy/ansible/04-Tomcat/templates/apps/index.html"
-}  
    
- }
+   stage('Jfrog Artifacory Upload') {
+        def server= Artifactory.server 'Artifactory'
+                    def uploadSpec= """{
+                        "files": [{
+                        "pattern": "target/*.war",
+                        "target": "capstoneproject"}]
+                    }"""
+        server.upload(uploadSpec)
+        
+        }
+	
+	stage('Downstream Build -- Docker Deployment'){
+	 build 'pipe-Docker'
+	}
+}  
 
-def project_terra="04-Terraform/03-Ansible-Deploy"
-dir(project_terra) {
-   stage('Prod Deployment on AWS'){
-   sh label: 'terraform', script: '/root/bin/terraform  init'
-   sh label: 'terraform', script: '/root/bin/terraform  apply -input=false -auto-approve'
-   }
-}
-
-// notify('Job Completed')   
+ notify('Job Completed')   
 } catch (err) {
- // notify("Error ${err}")
+  notify("Error ${err}")
   currentBuild.result = 'FAILURE'
 }
 }
