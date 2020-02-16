@@ -1,4 +1,5 @@
 node {
+agent any
  try  {
   notify('Job Started') 
      
