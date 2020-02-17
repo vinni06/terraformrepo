@@ -6,16 +6,13 @@ node {
    git 'https://github.com/vinni06/terraformrepo.git'
   }
     
- //def project_path="capstoneproject/capstoneproject/"
- 
-// dir(project_path) {
 
 stage('Download package from JFrog') {
             def server= Artifactory.server 'Artifactory'
             def downloadSpec = """{
             "files": [
             {
-                "pattern": "examples-repo-local/petclinic.war",
+                "pattern": "petclinic/petclinic.war",
                 "target": "./petclinic.war"
             }
             ]
@@ -30,11 +27,7 @@ stage('Download package from JFrog') {
 	   }
 	   stage('Deployment into production'){
  	 sh label: 'terraform', script: 'sudo ansible-playbook -i /root/.jenkins/workspace/pipe-Terraform/inventory -u ubuntu --key /root/.ssh/vkey.pem ./web-playbook.yaml'
-     }
-  
-	   
-   
-//}	-----------dir end---------  
+     }  
 
  notify('Job Completed')   
 } catch (err) {
