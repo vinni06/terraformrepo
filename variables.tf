@@ -1,9 +1,9 @@
 variable "key_name" {
-  default = "meghanamumbai"
+  default = "oregon1"
 }
 
 variable "pvt_key" {
-  default = "/root/.ssh/mkey.pem"
+  default = "/root/.ssh/hkey.pem"
 }
 
 variable "us-east-zones" {
@@ -11,5 +11,5 @@ variable "us-east-zones" {
 }
 
 variable "sg-id" {
-  default = "sg-0eb024eb164eb86c0"
+  default = "sg-0ab4771577b966dd3"
 }
