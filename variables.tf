@@ -1,9 +1,9 @@
 variable "key_name" {
-  default = "oregon1"
+  default = "vinnikey"
 }
 
 variable "pvt_key" {
-  default = "/root/.ssh/hkey.pem"
+  default = "/root/.ssh/vkey.pem"
 }
 
 variable "us-east-zones" {
