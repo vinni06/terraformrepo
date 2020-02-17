@@ -15,7 +15,7 @@ stage('Download package from JFrog') {
             def downloadSpec = """{
             "files": [
             {
-                "pattern": "examples-local-repo/petclinic.war",
+                "pattern": "examples-repo-local/petclinic.war",
                 "target": "./petclinic.war"
             }
             ]
