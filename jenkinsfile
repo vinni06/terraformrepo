@@ -10,15 +10,28 @@ node {
  
 // dir(project_path) {
 
+stage('Download package from JFrog') {
+            def server= Artifactory.server 'Artifactory'
+            def downloadSpec = """{
+            "files": [
+            {
+                "pattern": "examples-local-repo/petclinic.war",
+                "target": "./petclinic.war"
+            }
+            ]
+            }"""
+        server.download(downloadSpec)
+    }
+
 	stage('AWS - Production Server Provisioning'){
 	   sh label: 'terraform', script: '/bin/terraform  init'
 	   sh label: 'terraform', script: '/bin/terraform  apply -input=false -auto-approve'
 	   }
-	   
-	   stage('Downstream Build -- Ansible Deployment'){
-		 	build 'pipe-Ansible'
-		}
+	   stage('Deployment into production'){
+ 	 sh label: 'terraform', script: 'ansible-playbook -i /root/.jenkins/workspace/pipe-Terraform/inventory -u ubuntu --key /root/.ssh/vkey.pem ./web-playbook.yaml'
+     }
   
+	   
    
 //}	-----------dir end---------  
 
