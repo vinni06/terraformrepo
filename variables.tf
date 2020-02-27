@@ -3,7 +3,7 @@ variable "key_name" {
 }
 
 variable "pvt_key" {
-  default = "/root/.ssh/vkey.pem"
+  default = "/root/.ssh/vinnikey.pem"
 }
 
 variable "us-east-zones" {
