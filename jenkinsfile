@@ -26,7 +26,7 @@ stage('Download package from JFrog') {
 	   sh label: 'terraform', script: '/bin/terraform  apply -input=false -auto-approve'
 	   }
 	   stage('Deployment into production'){
- 	 sh label: 'terraform', script: 'sudo ansible-playbook -i /root/.jenkins/workspace/pipe-Terraform/inventory -u ubuntu --key /root/.ssh/vkey.pem ./web-playbook.yaml'
+ 	 sh label: 'terraform', script: 'sudo ansible-playbook -i /root/.jenkins/workspace/pipe-Terraform/inventory -u ubuntu --key /root/.ssh/vinnikey.pem ./web-playbook.yaml'
      }  
 
  notify('Job Completed')   
