@@ -19,7 +19,7 @@ stage('Download package from JFrog') {
             }"""
         server.download(downloadSpec)
     }
-    stage('test') {sh 'ls -a'}
+ 
 
 	stage('AWS - Production Server Provisioning'){
 	   sh label: 'terraform', script: '/bin/terraform  init'
